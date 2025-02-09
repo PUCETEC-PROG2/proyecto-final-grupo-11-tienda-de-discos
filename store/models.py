@@ -9,6 +9,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.01'))])
     created_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(max_length=200)
+    picture = models.ImageField(upload_to='products/', null=True, blank=True)
     class Meta:
         abstract = True
 
@@ -38,7 +39,6 @@ class MusicProduct(Product):
         ('cassete', 'Cassete')
     ]
     format = models.CharField(max_length=100, choices=FORMAT_CHOICES)
-    
     def __str__(self):
         return f"{self.artist} - {self.title}"
     
@@ -55,7 +55,6 @@ class ElectronicProduct(Product):
     ]
     category = models.CharField(max_length=100, choices=CATEGORY_CHOICES)
     description = models.TextField(max_length=200)
-    
     def __str__(self):
         return f"{self.brand} - {self.model}"
 
@@ -65,6 +64,7 @@ class Client(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=10)
     address = models.TextField(max_length=200)
+
     
 class Order(models.Model):
     client = models.ForeignKey(Client, on_delete=models.PROTECT)
@@ -76,7 +76,7 @@ class Order(models.Model):
         ('entregado', 'Entregado'),
         ('cancelado', 'cancelado'),
     ]
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendiente')
     music_products = models.ManyToManyField(MusicProduct, through='OrderMusicItem')
     electronic_products = models.ManyToManyField(ElectronicProduct, through='OrderElectronicItem')
 

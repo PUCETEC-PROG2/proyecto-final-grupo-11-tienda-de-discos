@@ -1,9 +1,16 @@
 from django.shortcuts import render
-from django.template import loader
-from django.http import HttpResponse
-from django.shortcuts import render, redirect
-from django.contrib.auth.views import LoginView
-from django.contrib.auth.forms import login_required
+from django.views.generic import ListView, DetailView
+from .models import MusicProduct, ElectronicProduct
 
-# Create your views here.
+from django.shortcuts import render
+from django.views.generic import ListView, DetailView
+from .models import MusicProduct, ElectronicProduct
 
+def index(request):
+    music_products = MusicProduct.objects.all()[:3]
+    electronic_products = ElectronicProduct.objects.all()[:3]
+    context = {
+        'music_products': music_products,
+        'electronic_products': electronic_products
+    }
+    return render(request, 'index.html', context)

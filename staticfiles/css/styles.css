@@ -1,0 +1,42 @@
+.banner-wrapper {
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.banner-content {
+    position: relative;
+    width: 100%;
+    padding: 20px;
+    height: 120px;
+}
+
+.banner-img {
+    width: fit-content;
+    height: 90px;
+    object-fit: contain;
+    display: block;
+    background-color: var(--bs-primary);
+    margin-left: 20px;
+
+}
+
+.nav-container {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.nav-container .nav {
+    display: flex;
+    gap: 1rem;  
+}
+
+.nav-container .nav-item {
+    margin-right: 1rem;  
+}
+

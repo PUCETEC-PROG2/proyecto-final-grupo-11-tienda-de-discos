@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>OG'old Music</title>
+        <link href="{% static 'bootstrap.min.css' %}" rel="stylesheet">
+        <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+        <link href="{% static 'css/sidebar.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="{% static 'js/sidebar_toggle.js' %}" defer></script>
+        {% block extra_css %}{% endblock extra_css %}
+    </head>
+    <body>
+        <!-- Banner -->
+        <div class="banner-wrapper">
+            <div class="banner-content bg-primary">
+                <img src="{% static 'store_banner.png' %}" alt="stbanner" title="store_banner" class="banner-img">
+                <div class="nav-container">
+                    <ul class="nav">
+                        <li class="nav-item">
+                            <a class="btn btn-secondary" href="#">Cerrar Sesión</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-secondary" href="#">Pedidos</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="btn btn-secondary" href="#">Iniciar Sesión</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wrapper principal -->
+        <div class="d-flex" id="wrapper">
+            <!-- Sidebar -->
+            <div class="border-end bg-white" id="sidebar-wrapper">
+                <div class="sidebar-heading border-bottom bg-secondary text-white">Categorías</div>
+                <div class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action p-3">Música</a>
+                    <a href="#" class="list-group-item list-group-item-action p-3">Electrónicos</a>
+                    <a href="#" class="list-group-item list-group-item-action p-3">Ofertas</a>
+                </div>
+            </div>
+
+            <!-- Page Content -->
+            <div id="page-content-wrapper">
+                <button class="btn btn-primary m-3" id="menu-toggle">
+                    <i class="fas fa-bars"></i> Menú
+                </button>
+                
+                <!-- Main Content -->
+                <div class="container-fluid">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+
+        {% block extra_js %}{% endblock extra_js %}
+    </body>
+</html>
