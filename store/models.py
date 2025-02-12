@@ -65,6 +65,9 @@ class Client(models.Model):
     phone = models.CharField(max_length=10)
     address = models.TextField(max_length=200)
 
+    def __str__(self):
+        return f"{self.name} {self.last_name}"    
+
     
 class Order(models.Model):
     client = models.ForeignKey(Client, on_delete=models.PROTECT)
@@ -93,7 +96,7 @@ class Order(models.Model):
         return subtotal + iva
 
     def __str__(self):
-        return f"Order {self.id} - {self.client.name}"
+        return f"Orden {self.id} - {self.client.name}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
