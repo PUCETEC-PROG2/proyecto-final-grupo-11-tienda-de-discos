@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock title %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        {% for product in products %}
+        <div class="col-sm-4 mb-4">
+            {% if product.product_type == 'music' %}
+            <a href="/music/{{ product.pk }}">
+                <div class="card" style="width: 100%">
+                    <img class="card-img-top" src="{{ product.picture.url }}" />
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product | capfirst }}</h5>
+                        <p class="card-text">Género: {{ product.get_genre_display }}</p>
+                        <p class="card-text">Formato: {{ product.get_format_display }}</p>
+                        <p class="card-text mb-3">Precio: {{ product.price }}</p>
+
+                        {% if user.is_authenticated %}
+                        <a
+                            href="/edit_music_product/{{product.pk}}"
+                            class="btn btn-primary"
+                            ><i class="fa-solid fa-pen-to-square"></i
+                        ></a>
+                        <a
+                            href="/delete_music_product/{{product.pk}}"
+                            class="btn btn-danger"
+                            ><i class="fa-solid fa-trash"></i
+                        ></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% elif product.product_type == 'electronic' %}
+            <a href="/electronic/{{ product.pk }}">
+                <div class="card" style="width: 100%">
+                    <img class="card-img-top" src="{{ product.picture.url }}" />
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product | capfirst }}</h5>
+                        <p class="card-text">Marca: {{ product.brand }}</p>
+                        <p class="card-text">Modelo: {{ product.model }}</p>
+                        <p class="card-text mb-3">Precio: {{ product.price }}</p>
+
+                        {% if user.is_authenticated %}
+                        <a
+                            href="/edit_electronic_product/{{product.pk}}"
+                            class="btn btn-primary"
+                            ><i class="fa-solid fa-pen-to-square"></i
+                        ></a>
+                        <a
+                            href="/delete_electronic_product/{{product.pk}}"
+                            class="btn btn-danger"
+                            ><i class="fa-solid fa-trash"></i
+                        ></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}
