@@ -3,8 +3,9 @@ from django.views.generic import ListView, DetailView
 from .models import MusicProduct, ElectronicProduct
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from itertools import chain
-from .models import MusicProduct, ElectronicProduct
-from store.forms import ProductTypeForm, MusicProductForm, ElectronicProductForm
+from django.contrib import messages
+from .models import MusicProduct, ElectronicProduct, Client
+from store.forms import ProductTypeForm, MusicProductForm, ElectronicProductForm, EditClientForm
 
 
 def index(request):
