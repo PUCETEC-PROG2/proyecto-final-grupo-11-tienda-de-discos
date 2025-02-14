@@ -76,6 +76,7 @@ def electronic_product(request):
         'paginator': paginator
     }
     return render(request, 'electronic.html', context)
+    
 def add_product(request):
     type_form = ProductTypeForm(request.POST or None)
     music_form = MusicProductForm(request.POST or None, request.FILES or None)
