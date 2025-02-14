@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Checkout</h1>
+    <form method="post" action="{% url 'store:create_order' %}">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-header">
+                <h5>Datos del Cliente</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="{{ client_form.name.id_for_label }}">Nombre</label>
+                    {{ client_form.name }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ client_form.last_name.id_for_label }}">Apellido</label>
+                    {{ client_form.last_name }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ client_form.email.id_for_label }}">Email</label>
+                    {{ client_form.email }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ client_form.phone.id_for_label }}">Teléfono</label>
+                    {{ client_form.phone }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ client_form.address.id_for_label }}">Dirección</label>
+                    {{ client_form.address }}
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Confirmar Compra</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

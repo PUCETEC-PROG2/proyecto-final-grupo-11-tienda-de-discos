@@ -2,72 +2,73 @@
 {% block title %}Productos{% endblock title %}
 {% block content %}
 <div class="container-fluid">
+    <!-- Sección de Productos Musicales -->
+    <h2 class="mb-4">Productos Musicales</h2>
     <div class="row">
         {% for product in products %}
+        {% if product.product_type == 'music' %}
         <div class="col-sm-2 mb-4">
-            {% if product.product_type == 'music' %}
-            <a href="/music/{{ product.pk }}">
-                <div class="card" style="width: 100%">
-                    <img class="card-img-top" src="{{ product.picture.url }}" />
-                    <div class="card-body">
-                        <h5 class="card-title">{{ product | capfirst }}</h5>
-                        <p class="card-text">Género: {{ product.get_genre_display }}</p>
-                        <p class="card-text">Formato: {{ product.get_format_display }}</p>
-                        <p class="card-text mb-3">Precio: {{ product.price }}</p>
+            <div class="card" style="width: 100%">
+                <img class="card-img-top" src="{{ product.picture.url }}" />
+                <div class="card-body">
+                    <h5 class="card-title">{{ product | capfirst }}</h5>
+                    <p class="card-text">Género: {{ product.get_genre_display }}</p>
+                    <p class="card-text">Formato: {{ product.get_format_display }}</p>
+                    <p class="card-text mb-3">Precio: {{ product.price }}</p>
 
-                        {% if user.is_authenticated %}
-                        <a
-                            href="/edit_music_product/{{product.pk}}"
-                            class="btn btn-primary"
-                            ><i class="fa-solid fa-pen-to-square"></i
-                        ></a>
-                        <a
-                            href="/delete_music_product/{{product.pk}}"
-                            class="btn btn-danger"
-                            ><i class="fa-solid fa-trash"></i
-                        ></a>
-                        {% endif %}
-                    </div>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'store:edit_music' product.pk %}" class="btn btn-primary">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                    <a href="#" class="btn btn-danger">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                    {% endif %}
                 </div>
-            </a>
-            {% elif product.product_type == 'electronic' %}
-            <a href="/electronic/{{ product.pk }}">
-                <div class="card" style="width: 100%">
-                    <img class="card-img-top" src="{{ product.picture.url }}" />
-                    <div class="card-body">
-                        <h5 class="card-title">{{ product | capfirst }}</h5>
-                        <p class="card-text">Marca: {{ product.brand }}</p>
-                        <p class="card-text">Modelo: {{ product.model }}</p>
-                        <p class="card-text mb-3">Precio: {{ product.price }}</p>
-
-                        {% if user.is_authenticated %}
-                        <a
-                            href="/edit_electronic_product/{{product.pk}}"
-                            class="btn btn-primary"
-                            ><i class="fa-solid fa-pen-to-square"></i
-                        ></a>
-                        <a
-                            href="/delete_electronic_product/{{product.pk}}"
-                            class="btn btn-danger"
-                            ><i class="fa-solid fa-trash"></i
-                        ></a>
-                        {% endif %}
-                    </div>
-                </div>
-            </a>
-            {% endif %}
+            </div>
         </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+
+    <!-- Sección de Productos Electrónicos -->
+    <h2 class="mt-5 mb-4">Productos Electrónicos</h2>
+    <div class="row">
+        {% for product in products %}
+        {% if product.product_type == 'electronic' %}
+        <div class="col-sm-2 mb-4">
+            <div class="card" style="width: 100%">
+                <img class="card-img-top" src="{{ product.picture.url }}" />
+                <div class="card-body">
+                    <h5 class="card-title">{{ product | capfirst }}</h5>
+                    <p class="card-text">Marca: {{ product.brand }}</p>
+                    <p class="card-text">Modelo: {{ product.model }}</p>
+                    <p class="card-text mb-3">Precio: {{ product.price }}</p>
+
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'store:edit_electronic' product.pk %}" class="btn btn-primary">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                    <a href="#" class="btn btn-danger">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
         {% endfor %}
     </div>
 </div>
 
-<div class="container">
+<!-- Paginación -->
+<div class="container mt-4">
     <div class="row">
         <div class="col-12 d-flex justify-content-center">
-            <nav aria-label="Page navigation example">
+            <nav aria-label="Page navigation">
                 <ul class="pagination pagination-lg">
                     {% for page in paginator.page_range %}
-                    {% if page == product.number %}
+                    {% if page == products.number %}
                         <span class="page-link">{{ page }}<span class="sr-only">(current)</span></span>
                     {% else %}
                         <li class="page-item"><a class="page-link" href="?page={{ page }}">{{ page }}</a></li>

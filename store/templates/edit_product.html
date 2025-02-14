@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Editar Producto{% endblock title %}
+{% block content %}
+<div class="container mt-4">
+    <h1>Editar Producto</h1>
+    
+    <form method="post" enctype="multipart/form-data" id="product-form">
+        {% csrf_token %}
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Información Básica:</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}">Nombre</label>
+                    {{ form.name }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ form.price.id_for_label }}">Precio</label>
+                    {{ form.price }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ form.description.id_for_label }}">Descripción</label>
+                    {{ form.description }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ form.stock.id_for_label }}">Stock</label>
+                    {{ form.stock }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ form.picture.id_for_label }}">Imagen</label>
+                    {{ form.picture }}
+                    {% if product.picture %}
+                        <p class="mt-2">Imagen actual: <img src="{{ product.picture.url }}" alt="{{ product.name }}" style="max-height: 100px;"></p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        {% if product_type == 'music' %}
+        <div id="music-fields" class="card mb-4">
+            <div class="card-header">
+                <h5>Detalles de Música</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="{{ form.artist.id_for_label }}">Artista</label>
+                    {{ form.artist }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ form.title.id_for_label }}">Título</label>
+                    {{ form.title }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ form.release_date.id_for_label }}">Fecha de Lanzamiento</label>
+                    {{ form.release_date }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ form.genre.id_for_label }}">Género</label>
+                    {{ form.genre }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ form.format.id_for_label }}">Formato</label>
+                    {{ form.format }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if product_type == 'electronic' %}
+        <div id="electronic-fields" class="card mb-4">
+            <div class="card-header">
+                <h5>Detalles de Electrónicos</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="{{ form.brand.id_for_label }}">Marca</label>
+                    {{ form.brand }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ form.model.id_for_label }}">Modelo</label>
+                    {{ form.model }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ form.category.id_for_label }}">Categoría</label>
+                    {{ form.category }}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <button type="submit" class="btn btn-primary mb-4">Guardar Cambios</button>
+        <a href="{% if product_type == 'music' %}{% url 'store:all_music' %}{% else %}{% url 'store:all_electronic' %}{% endif %}" 
+           class="btn btn-secondary mb-4">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
