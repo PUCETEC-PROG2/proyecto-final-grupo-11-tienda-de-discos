@@ -2,7 +2,7 @@
 {% block title %}Inicio{% endblock title %}
 {% block content %}
 {% for product in products %}
-<div class="col-sm-4 mb-4">
+<div class="col-sm-2 mb-4">
     {% if product.product_type == 'music' %}
     <div class="card" style="width: 100%">
         <img class="card-img-top" src="{{ product.picture.url }}" />
