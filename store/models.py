@@ -92,11 +92,11 @@ class Order(models.Model):
     @property
     def total_amount(self):
         subtotal = self.subtotal_amount
-        iva = subtotal * 0.15
+        iva = subtotal * Decimal('0.15')
         return subtotal + iva
 
     def __str__(self):
-        return f"Orden {self.id} - {self.client.name}"
+        return f"Orden {self.id} - {self.client.name} {self.client.last_name}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)

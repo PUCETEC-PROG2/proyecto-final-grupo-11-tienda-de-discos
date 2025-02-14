@@ -1,10 +1,9 @@
 from django.shortcuts import redirect, render
-from django.shortcuts import redirect, render
 from django.views.generic import ListView, DetailView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from itertools import chain
 from django.contrib import messages
-from .models import MusicProduct, ElectronicProduct, Client
+from .models import MusicProduct, ElectronicProduct, Client, Order
 from store.forms import ProductTypeForm, MusicProductForm, ElectronicProductForm, EditClientForm
 
 
@@ -29,8 +28,20 @@ def all_products(request):
     for product in electronic_products:
         product.product_type = 'electronic'
 
+    page = request.GET.get('page', 1) 
+    items_per_page = 10
+    paginator = Paginator(combined_products, items_per_page)
+    
+    try:
+        music = paginator.page(page)
+    except PageNotAnInteger:
+        music = paginator.page(1)
+    except EmptyPage:
+        music = paginator.page(paginator.num_pages)
+
     context = {
         'products': combined_products,
+        'paginator': paginator,
     }
     return render(request, 'products.html', context)
 
@@ -78,7 +89,6 @@ def electronic_product(request):
         'paginator': paginator
     }
     return render(request, 'electronic.html', context)
-    
 
 def add_product(request):
     type_form = ProductTypeForm(request.POST or None)
@@ -138,3 +148,10 @@ def edit_client(request, pk):
         'client': client
     }
     return render(request, 'edit_client.html', context)
+
+def view_orders(request):
+    orders = Order.objects.all()
+    context = {
+        'orders': orders,
+    }
+    return render(request, 'orders.html', context)
