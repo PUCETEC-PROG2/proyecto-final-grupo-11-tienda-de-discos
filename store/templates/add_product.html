@@ -1,0 +1,126 @@
+<!-- add_product.html -->
+{% extends "base.html" %}
+{% block title %}Añadir Producto{% endblock title %}
+{% block content %}
+<div class="container mt-4">
+    <h1>Añadir Productos</h1>
+    
+    <form method="post" enctype="multipart/form-data" id="product-form">
+        {% csrf_token %}
+        
+        <div class="form-group mb-4">
+            <h4>Seleccione el tipo de producto</h4>
+            {{ type_form.product_type }}
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Información Básica:</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="{{ music_form.name.id_for_label }}">Nombre</label>
+                    {{ music_form.name }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ music_form.price.id_for_label }}">Precio</label>
+                    {{ music_form.price }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ music_form.description.id_for_label }}">Descripción</label>
+                    {{ music_form.description }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ music_form.picture.id_for_label }}">Imagen</label>
+                    {{ music_form.picture }}
+                </div>
+            </div>
+        </div>
+        
+        <div id="music-fields" class="card mb-4" style="display: none;">
+            <div class="card-header">
+                <h5>Música</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="{{ music_form.artist.id_for_label }}">Artista</label>
+                    {{ music_form.artist }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ music_form.title.id_for_label }}">Título</label>
+                    {{ music_form.title }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ music_form.release_date.id_for_label }}">Fecha de Lanzamiento</label>
+                    {{ music_form.release_date }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ music_form.genre.id_for_label }}">Génro</label>
+                    {{ music_form.genre }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ music_form.format.id_for_label }}">Formato</label>
+                    {{ music_form.format }}
+                </div>
+            </div>
+        </div>
+        
+        <div id="electronic-fields" class="card mb-4" style="display: none;">
+            <div class="card-header">
+                <h5>Electrónicos</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="{{ electronic_form.brand.id_for_label }}">Marca</label>
+                    {{ electronic_form.brand }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ electronic_form.model.id_for_label }}">Modelo</label>
+                    {{ electronic_form.model }}
+                </div>
+                <div class="form-group mt-3">
+                    <label for="{{ electronic_form.category.id_for_label }}">Categoría</label>
+                    {{ electronic_form.category }}
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit" class="btn btn-primary mb-4">Guardar</button>
+        <a href="{% url 'store:index' %}" class="btn btn-secondary mb-4">Cancelar</a>
+    </form>
+</div>
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const productTypeInputs = document.querySelectorAll('input[name="product_type"]');
+        const musicFields = document.getElementById('music-fields');
+        const electronicFields = document.getElementById('electronic-fields');
+        
+        // Initial check
+        updateFormVisibility();
+        
+        // Add event listeners to all radio buttons
+        productTypeInputs.forEach(input => {
+            input.addEventListener('change', updateFormVisibility);
+        });
+        
+        function updateFormVisibility() {
+            const selectedType = document.querySelector('input[name="product_type"]:checked')?.value;
+            
+            if (selectedType === 'music') {
+                musicFields.style.display = 'block';
+                electronicFields.style.display = 'none';
+            } else if (selectedType === 'electronic') {
+                musicFields.style.display = 'none';
+                electronicFields.style.display = 'block';
+            } else {
+                // If nothing selected yet
+                musicFields.style.display = 'none';
+                electronicFields.style.display = 'none';
+            }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}
