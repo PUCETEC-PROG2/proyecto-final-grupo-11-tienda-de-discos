@@ -39,6 +39,17 @@ def all_products(request):
     except EmptyPage:
         music = paginator.page(paginator.num_pages)
 
+    page = request.GET.get('page', 1) 
+    items_per_page = 10
+    paginator = Paginator(combined_products, items_per_page)
+    
+    try:
+        music = paginator.page(page)
+    except PageNotAnInteger:
+        music = paginator.page(1)
+    except EmptyPage:
+        music = paginator.page(paginator.num_pages)
+
     context = {
         'products': combined_products,
         'paginator': paginator,
@@ -89,6 +100,7 @@ def electronic_product(request):
         'paginator': paginator
     }
     return render(request, 'electronic.html', context)
+
 
 def add_product(request):
     type_form = ProductTypeForm(request.POST or None)
