@@ -124,8 +124,6 @@ def add_product(request):
     }
     return render(request, 'add_product.html', context)
 
-
-
 def client_list(request):
     clients = Client.objects.order_by('name')
     page = request.GET.get('page', 1) 
