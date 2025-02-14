@@ -1,6 +1,6 @@
 # forms.py
 from django import forms
-from .models import MusicProduct, ElectronicProduct
+from .models import MusicProduct, ElectronicProduct, Client
 
 class ProductTypeForm(forms.Form):
     PRODUCT_TYPES = [
@@ -58,4 +58,23 @@ class ElectronicProductForm(forms.ModelForm):
             'model': forms.TextInput(attrs={'class': 'form-control'}),
             'category': forms.Select(attrs={'class': 'form-control'}),
             'picture': forms.ClearableFileInput(attrs={'class': 'form-control'}),
+        }
+        
+class EditClientForm(forms.ModelForm):
+    class Meta:
+        model = Client
+        fields = ['name', 'last_name', 'email', 'phone', 'address']
+        labels = {
+            'name': 'Nombre',
+            'last_name': 'Apellido',
+            'email': 'Correo Electrónico',
+            'phone': 'Teléfono',
+            'address': 'Dirección'
+        }
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'address': forms.TextInput(attrs={'class': 'form-control'}),
         }

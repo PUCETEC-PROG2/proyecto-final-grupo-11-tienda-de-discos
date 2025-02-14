@@ -3,8 +3,9 @@ from django.views.generic import ListView, DetailView
 from .models import MusicProduct, ElectronicProduct
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from itertools import chain
+from .models import MusicProduct, ElectronicProduct
 from store.forms import ProductTypeForm, MusicProductForm, ElectronicProductForm
-from django.contrib import messages
+
 
 def index(request):
     music_products = MusicProduct.objects.all()[:3]
@@ -100,3 +101,39 @@ def add_product(request):
     }
     return render(request, 'add_product.html', context)
 
+
+
+def client_list(request):
+    clients = Client.objects.order_by('name')
+    page = request.GET.get('page', 1) 
+    items_per_page = 10
+    paginator = Paginator(clients, items_per_page)
+    
+    try:
+        clients_page = paginator.page(page)
+    except PageNotAnInteger:
+        clients_page = paginator.page(1)
+    except EmptyPage:
+        clients_page = paginator.page(paginator.num_pages)
+    
+    context = {
+        'clients': clients_page,
+        'paginator': paginator,
+    }
+    return render(request, 'show_clients.html', context)
+
+    
+def edit_client(request, pk):
+    client = Client.objects.get(pk=pk)
+    client_form = EditClientForm(request.POST or None, instance=client)
+    
+    if request.method == 'POST' and client_form.is_valid():
+        client_form.save()
+        messages.success(request, "Cliente actualizado exitosamente.")
+        return redirect('store:show_clients') 
+    
+    context = {
+        'client_form': client_form,
+        'client': client
+    }
+    return render(request, 'edit_client.html', context)

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Lista de Clientes{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        {% for client in clients %}
+        <div class="col-sm-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ client.name }} {{ client.last_name }}</h5>
+                    <p class="card-text mb-3">Correo Electrónico: {{ client.email }}</p>
+                    <p class="card-text mb-3">Teléfono: {{ client.phone }}</p>
+                    <p class="card-text mb-3">Dirección: {{ client.address }}</p>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'store:edit_client' pk=client.pk %}" class="btn btn-primary">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                    <a href="#" class="btn btn-danger">
+                        <i class="fa-solid fa-trash"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if paginator.num_pages > 1 %}
+    <div class="row">
+        <div class="col-12 d-flex justify-content-center">
+            <nav aria-label="Navegación de páginas">
+                <ul class="pagination pagination-lg">
+                    {% if clients.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ clients.previous_page_number }}">Anterior</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page in paginator.page_range %}
+                    <li class="page-item {% if page == clients.number %}active{% endif %}">
+                        <a class="page-link" href="?page={{ page }}">{{ page }}</a>
+                    </li>
+                    {% endfor %}
+
+                    {% if clients.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ clients.next_page_number }}">Siguiente</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}
