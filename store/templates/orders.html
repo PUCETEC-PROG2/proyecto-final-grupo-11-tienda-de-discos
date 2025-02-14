@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% block title %}Órdenes{% endblock title %}
+{% block content %}
+<div class="container">
+    <div class="accordion" id="accordionOrders">
+        {% for order in orders %}
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button
+                    class="accordion-button collapsed"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{ order.id }}"
+                    aria-expanded="false"
+                    aria-controls="collapse{{ order.id }}"
+                >
+                    {{order | capfirst}}
+                </button>
+            </h2>
+            <div
+                id="collapse{{ order.id }}"
+                class="accordion-collapse collapse"
+                data-bs-parent="#accordionOrders"
+            >
+                <div class="accordion-body">
+                    <p>Fecha de creación: {{order.created_at}}</p>
+                    <p>Estado: {{order.get_status_display}}</p>
+                    <p>Valor: ${{order.total_amount|floatformat:2|intcomma }}</p>
+                    {% if user.is_authenticated %}
+                        <a
+                            href="/edit_order/{{order.pk}}"
+                            class="btn btn-primary"
+                            ><i class="fa-solid fa-pen-to-square"></i
+                        ></a>
+                        <a
+                            href="/delete_order/{{order.pk}}"
+                            class="btn btn-danger"
+                            ><i class="fa-solid fa-trash"></i
+                        ></a>
+                        {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock content %}
