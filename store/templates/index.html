@@ -3,7 +3,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col-9 mt-4">
-            <h1 class="ms-3">Productos Musicales</h1>
+            <h1 class="ms-3">Música Destacada</h1>
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 {% for product in music_products %}
                 <div class="col">
@@ -27,8 +27,9 @@
                 </div>
                 {% endfor %}
             </div>
-
-            <h1 class="mt-4">Productos Electrónicos</h1>
+            <br>
+            <a href="{% url 'store:all_music' %}" class="btn btn-primary">Listado de productos musicales</a> 
+            <h1 class="mt-4">Equipos destacados</h1>
             <div class="row row-cols-1 row-cols-md-3 g-4">
                 {% for product in electronic_products %}
                 <div class="col">
@@ -54,6 +55,8 @@
                 </div>
                 {% endfor %}
             </div>
+            <br>
+            <a href="{% url 'store:all_electronic' %}" class="btn btn-primary">Listado de electrónicos</a> 
         </div>
     </div>
 </div>
