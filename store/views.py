@@ -4,8 +4,7 @@ from .models import MusicProduct, ElectronicProduct
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from itertools import chain
 from store.forms import ProductTypeForm, MusicProductForm, ElectronicProductForm
-
-
+from django.contrib import messages
 
 def index(request):
     music_products = MusicProduct.objects.all()[:3]
@@ -77,6 +76,7 @@ def electronic_product(request):
         'paginator': paginator
     }
     return render(request, 'electronic.html', context)
+
 def add_product(request):
     type_form = ProductTypeForm(request.POST or None)
     music_form = MusicProductForm(request.POST or None, request.FILES or None)
@@ -98,3 +98,4 @@ def add_product(request):
         'electronic_form': electronic_form,
     }
     return render(request, 'add_product.html', context)
+
