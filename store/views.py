@@ -1,10 +1,9 @@
 from django.shortcuts import redirect, render
 from django.views.generic import ListView, DetailView
-from .models import MusicProduct, ElectronicProduct
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from itertools import chain
+from .models import MusicProduct, ElectronicProduct
 from store.forms import ProductTypeForm, MusicProductForm, ElectronicProductForm
-
 
 
 def index(request):
