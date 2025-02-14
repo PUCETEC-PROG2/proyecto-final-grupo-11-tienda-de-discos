@@ -19,16 +19,23 @@
                 <img src="{% static 'store_banner.png' %}" alt="stbanner" title="store_banner" class="banner-img">
                 <div class="nav-container">
                     <ul class="nav">
+                        {% if user.is_authenticated %}
                         <li class="nav-item">
                             <a class="btn btn-secondary" href="#">Cerrar Sesión</a>
                         </li>
+                        {% else %}
                         <li class="nav-item">
                             <a class="btn btn-secondary" href="#">Pedidos</a>
                         </li>
                         <li class="nav-item">
                             <a class="btn btn-secondary" href="#">Iniciar Sesión</a>
                         </li>
+                        {% endif %}
                     </ul>
+                    <form class="form-inline my-2 my-lg-0">
+                        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+                      </form>
                 </div>
             </div>
         </div>
