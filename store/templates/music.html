@@ -11,19 +11,25 @@
             <p class="card-text">Género: {{ product.get_genre_display }}</p>
             <p class="card-text">Formato: {{ product.get_format_display }}</p>
             <p class="card-text mb-3">Precio: {{ product.price }}</p>
-
-            {% if user.is_authenticated %}
-            <a href="#" class="btn btn-primary">
-                <i class="fa-solid fa-pen-to-square"></i>
-            </a>
-            <a href="#" class="btn btn-danger">
-                <i class="fa-solid fa-trash"></i>
-            </a>
+            
+            {% if product.stock > 0 %}
+                <p class="card-text mb-3 text-success">
+                    <i class="fas fa-check-circle"></i> Stock disponible: {{ product.stock }}
+                </p>
+                <a href="{% url 'store:add_to_cart' product.id %}" class="btn btn-primary">
+                    <i class="fa fa-cart-plus" aria-hidden="true"></i> Añadir al carrito
+                </a>
+            {% else %}
+                <p class="card-text mb-3 text-danger">
+                    <i class="fas fa-times-circle"></i> Producto agotado
+                </p>
+                <button class="btn btn-secondary" disabled>
+                    <i class="fa fa-cart-plus" aria-hidden="true"></i> Sin stock
+                </button>
             {% endif %}
         </div>
     </div>
 </div>
-<br>
 {% endif %}
 {% endfor %}
 

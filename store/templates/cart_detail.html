@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Carrito de Compras{% endblock title %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Carrito de Compras</h1>
+
+    {% if cart.cart %}
+        <div class="row">
+            <div class="col-12">
+                {% for item_id, item in cart.cart.items %}
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-md-3">
+                                {% if item.picture %}
+                                    <img src="{{ item.picture }}" class="img-fluid rounded" alt="{{ item.name }}">
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="card-title">{{ item.name }}</h5>
+                                <p class="card-text">Precio: ${{ item.price }}</p>
+                                <p class="card-text">Cantidad: {{ item.quantity }}</p>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <a href="{% url 'store:remove_from_cart' item.product_id %}" class="btn btn-danger">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            <br>
+            <div class="col-md-6">
+                <p>Subtotal: ${{ cart.get_subtotal }}</p>
+                <p>IVA: ${{ cart.get_tax_amount }}</p>
+                <p>Total: {{ cart.get_total_with_tax }}</p>
+            </div>
+            </div>
+            <br>
+            <div class="col-12 text-end">
+                <a href="{% url 'store:checkout'%}" class="btn btn-primary">
+                    <i class="fa fa-check-square-o" aria-hidden="true"></i> Completar orden
+                </a>
+            </div>
+            <br>
+            <br>
+            <div class="col-12 text-end">
+                <a href="{% url 'store:clear_cart'%}" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Limpiar carrito
+                </a>
+            </div>
+        </div>
+        <br>
+    {% else %}
+        <div class="alert alert-info">
+            <p class="mb-0">Tu carrito está vacío. <a href="{% url 'store:all_products' %}">Ver productos</a></p>
+        </div>
+    {% endif %}
+</div>
+{% endblock content %}

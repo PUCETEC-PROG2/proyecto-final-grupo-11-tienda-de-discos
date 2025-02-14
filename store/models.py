@@ -10,8 +10,10 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     description = models.TextField(max_length=200)
     picture = models.ImageField(upload_to='products/', null=True, blank=True)
+    stock = models.PositiveIntegerField(default=0, null=False, blank=False, validators=[MinValueValidator(0)])
     class Meta:
         abstract = True
+    
 
 class MusicProduct(Product):
     artist = models.CharField(max_length=100)
