@@ -1,6 +1,7 @@
 {% extends "base.html" %} {% block title %}Inicio{% endblock title %} 
 {% block content %}
 <div class="container-fluid">
+    {% if user.is_authenticated %}    
     <!-- Pedidos Pendientes -->
     <div class="row">
         <div class="col-12 mt-4">
@@ -78,6 +79,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     <!-- Productos Destacados -->
     <div class="row">
