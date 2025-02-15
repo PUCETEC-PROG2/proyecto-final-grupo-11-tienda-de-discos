@@ -12,11 +12,23 @@ from store.forms import ProductTypeForm, MusicProductForm, ElectronicProductForm
 
 
 def index(request):
-    music_products = MusicProduct.objects.all()[:3]
-    electronic_products = ElectronicProduct.objects.all()[:3]
+    # Obtener productos agotados (stock = 0)
+    out_of_stock_music = MusicProduct.objects.filter(stock=0)
+    out_of_stock_electronic = ElectronicProduct.objects.filter(stock=0)
+    
+    # Obtener productos destacados (los 3 más recientes)
+    featured_music = MusicProduct.objects.filter(stock__gt=0).order_by('-id')[:3]
+    featured_electronic = ElectronicProduct.objects.filter(stock__gt=0).order_by('-id')[:3]
+    
+    # Obtener pedidos pendientes
+    pending_orders = Order.objects.filter(status='pendiente')[:3]
+    
     context = {
-        'music_products': music_products,
-        'electronic_products': electronic_products
+        'featured_music': featured_music,
+        'featured_electronic': featured_electronic,
+        'out_of_stock_music': out_of_stock_music,
+        'out_of_stock_electronic': out_of_stock_electronic,
+        'pending_orders': pending_orders
     }
     return render(request, 'index.html', context)
 
