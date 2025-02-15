@@ -2,6 +2,9 @@
 {% block title %}Lista de Clientes{% endblock title %}
 {% block content %}
 <div class="container">
+    {% if user.is_authenticated %}
+    <a href="{% url 'store:add_client' %}" class="btn btn-primary mt-4 mb-4">Añadir Clientes</a>
+    {% endif %}
     <div class="row">
         {% for client in clients %}
         <div class="col-sm-4 mb-4">
@@ -15,10 +18,30 @@
                     <a href="{% url 'store:edit_client' pk=client.pk %}" class="btn btn-primary">
                         <i class="fa-solid fa-pen-to-square"></i>
                     </a>
-                    <a href="#" class="btn btn-danger">
+                    <a href="#" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ client.pk }}">
                         <i class="fa-solid fa-trash"></i>
                     </a>
                     {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="deleteModal{{ client.pk }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ client.pk }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel{{ client.pk }}">Confirmar eliminación</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Está seguro que desea eliminar al cliente {{ client.name }} {{ client.last_name }}?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <form method="POST" action="{% url 'store:delete_client' client.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Eliminar</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

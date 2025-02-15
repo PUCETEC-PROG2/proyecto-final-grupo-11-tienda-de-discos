@@ -164,6 +164,22 @@ def client_list(request):
     }
     return render(request, 'show_clients.html', context)
 
+@login_required
+def add_client(request):
+    if request.method == "POST":
+        form = EditClientForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cliente añadido exitosamente.")
+            return redirect('store:show_clients')
+        else:
+            messages.error(request, "Por favor corrija los errores en el formulario.")
+    else:
+        form = EditClientForm()
+    return render(request, 'add_client.html', {'form': form})
+
+
+
 @login_required    
 def edit_client(request, pk):
     client = Client.objects.get(pk=pk)
@@ -182,6 +198,15 @@ def edit_client(request, pk):
         'client': client
     }
     return render(request, 'edit_client.html', context)
+
+@login_required
+def delete_client(request, pk):
+    client = Client.objects.get(pk = pk)
+    client.delete()
+    return redirect('store:show_clients')
+
+class CustomLoginView(LoginView):
+    template_name = "login_form.html"
 
 def view_orders(request):
     orders = Order.objects.all()

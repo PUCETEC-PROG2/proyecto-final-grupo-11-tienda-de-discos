@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container-fluid">
     {% if user.is_authenticated %}
-    <a href="{% url 'store:add_product' %}" class="btn btn-primary mt-2 mb-2">Añadir Productos</a>
+    <a href="{% url 'store:add_product' %}" class="btn btn-primary mt-4 mb-4">Añadir Productos</a>
     {% endif %}
     <!-- Sección de Productos Musicales -->
     <h2 class="mb-4">Productos Musicales</h2>
@@ -22,9 +22,6 @@
                     {% if user.is_authenticated %}
                     <a href="{% url 'store:edit_music' product.pk %}" class="btn btn-primary">
                         <i class="fa-solid fa-pen-to-square"></i>
-                    </a>
-                    <a href="#" class="btn btn-danger">
-                        <i class="fa-solid fa-trash"></i>
                     </a>
                     {% endif %}
                 </div>

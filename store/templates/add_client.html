@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Añadir Cliente{% endblock title %}
+{% block content %}
+<div class="container">
+    <h2 class="mb-4">Añadir Cliente</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.name.id_for_label }}">Nombre:</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                    <div class="alert alert-danger">{{ form.name.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.last_name.id_for_label }}">Apellido:</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <div class="alert alert-danger">{{ form.last_name.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.email.id_for_label }}">Email:</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="alert alert-danger">{{ form.email.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="col-md-6 mb-3">
+                <label for="{{ form.phone.id_for_label }}">Teléfono:</label>
+                {{ form.phone }}
+                {% if form.phone.errors %}
+                    <div class="alert alert-danger">{{ form.phone.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="mb-3">
+            <label for="{{ form.address.id_for_label }}">Dirección:</label>
+            {{ form.address }}
+            {% if form.address.errors %}
+                <div class="alert alert-danger">{{ form.address.errors }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+    </form>
+</div>
+{% endblock %}

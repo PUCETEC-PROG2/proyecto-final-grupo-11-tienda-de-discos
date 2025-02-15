@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}Inicio{% endblock title %}
 {% block content %}
+{% if user.is_authenticated %}
+    <a href="{% url 'store:add_product' %}" class="btn btn-primary mt-4 mb-4">Añadir Productos</a>
+{% endif %}
 {% for product in products %}
 <div class="col-sm-2 mb-4">
     {% if product.product_type == 'music' %}
