@@ -1,4 +1,5 @@
 {% extends "base.html" %} {% block title %}Inicio{% endblock title %} 
+{% load humanize %}
 {% block content %}
 <div class="container-fluid">
     {% if user.is_authenticated %}    
@@ -15,7 +16,7 @@
                                 <h5 class="card-title">Pedido #{{ order.id }}</h5>
                                 <p class="card-text">Cliente: {{ order.client.name }} {{ order.client.last_name }}</p>
                                 <p class="card-text">Fecha: {{ order.created_at|date:"d/m/Y" }}</p>
-                                <p class="card-text">Total: ${{ order.total }}</p>
+                                <p class="card-text">Total: ${{ order.total_amount|floatformat:2|intcomma }}</p>
                                 <span class="badge bg-warning">Pendiente</span>
                             </div>
                         </div>

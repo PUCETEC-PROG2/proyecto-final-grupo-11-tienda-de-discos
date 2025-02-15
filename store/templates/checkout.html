@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 {% block title %}Checkout{% endblock %}
 
 {% block content %}
@@ -35,11 +36,11 @@
             </div>
             <div class="row">
                 <div class="col"><strong>IVA (15%):</strong></div>
-                <div class="col text-end"><strong>${{ cart.get_tax_amount }}</strong></div>
+                <div class="col text-end"><strong>${{ cart.get_tax_amount|floatformat:2|intcomma }}</strong></div>
             </div>
             <div class="row">
                 <div class="col"><strong>Total:</strong></div>
-                <div class="col text-end"><strong>${{ cart.get_total_with_tax }}</strong></div>
+                <div class="col text-end"><strong>${{ cart.get_total_with_tax|floatformat:2|intcomma }}</strong></div>
             </div>
         </div>
     </div>
