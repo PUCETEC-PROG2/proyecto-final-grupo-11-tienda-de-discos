@@ -5,7 +5,7 @@ from django.contrib import messages
 from .models import MusicProduct, ElectronicProduct, Client, Order, OrderMusicItem, OrderElectronicItem
 from .shopping_cart import ShoppingCart
 from .pagination import PaginationMixin
-from store.forms import ProductTypeForm, MusicProductForm, ElectronicProductForm, EditClientForm
+from store.forms import ProductTypeForm, MusicProductForm, ElectronicProductForm, EditClientForm, OrderStatusForm, OrderMusicItemForm, OrderElectronicItemForm
 
 
 def index(request):
@@ -183,6 +183,89 @@ def view_orders(request):
         'orders': orders,
     }
     return render(request, 'orders.html', context)
+
+def edit_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    client_form = EditClientForm(request.POST or None, instance=order.client)
+
+    if request.method == 'POST':
+        if 'update_client' in request.POST:
+            if client_form.is_valid():
+                client_form.save()
+                messages.success(request, "Datos del cliente actualizados exitosamente")
+                return redirect('store:edit_order', order_id=order.id)
+        elif 'cancel_order' in request.POST:
+            try:
+                # Restaurar stock de productos musicales
+                for music_item in order.ordermusicitem_set.all():
+                    product = music_item.product
+                    product.stock += music_item.quantity
+                    product.save()
+                    music_item.delete()
+                
+                # Restaurar stock de productos electrónicos
+                for electronic_item in order.orderelectronicitem_set.all():
+                    product = electronic_item.product
+                    product.stock += electronic_item.quantity
+                    product.save()
+                    electronic_item.delete()
+                
+                # Marcar orden como cancelada
+                order.status = 'Cancelada'
+                order.save()
+                
+                messages.success(request, "Orden cancelada y stock restaurado exitosamente")
+                return redirect('store:view_orders')
+                
+            except Exception as e:
+                messages.error(request, f"Error al cancelar la orden: {str(e)}")
+        else:
+            # Solo permitir cambiar el estado si no está cancelada
+            if order.status != 'Cancelada':
+                status_form = OrderStatusForm(request.POST, instance=order)
+                if status_form.is_valid():
+                    status_form.save()
+                    messages.success(request, "Estado de la orden actualizado exitosamente")
+                    return redirect('store:view_orders')
+    
+    # Si la orden está cancelada, mostrar mensaje informativo
+    if order.status == 'Cancelada':
+        messages.info(request, "Esta orden está cancelada. Para modificar los productos, por favor cree una nueva orden.")
+    
+    context = {
+        'order': order,
+        'status_form': OrderStatusForm(instance=order) if order.status != 'Cancelada' else None,
+        'client_form': client_form,
+        'music_items': order.ordermusicitem_set.all(),
+        'electronic_items': order.orderelectronicitem_set.all(),
+    }
+    return render(request, 'edit_order.html', context)
+
+
+def remove_order_item(request, order_id, item_id, item_type):
+    order = get_object_or_404(Order, id=order_id)
+    
+    try:
+        if item_type == 'music':
+            item = get_object_or_404(OrderMusicItem, id=item_id, order=order)
+            product = item.product
+        else:
+            item = get_object_or_404(OrderElectronicItem, id=item_id, order=order)
+            product = item.product
+            
+        # Devolver el stock
+        product.stock += item.quantity
+        product.save()
+        
+        # Eliminar el item
+        item.delete()
+        
+        messages.success(request, "Producto eliminado de la orden exitosamente")
+        
+    except Exception as e:
+        messages.error(request, f"Error al eliminar el producto: {str(e)}")
+        
+    return redirect('store:edit_order', order_id=order_id)
 
 ####################### Vistas para gestionar el carrito de compras #######################
 def add_to_cart(request, pk):

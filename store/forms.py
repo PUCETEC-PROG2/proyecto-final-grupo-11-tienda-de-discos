@@ -1,6 +1,6 @@
 # forms.py
 from django import forms
-from .models import MusicProduct, ElectronicProduct, Client
+from .models import MusicProduct, ElectronicProduct, Client, OrderMusicItem, OrderElectronicItem, Order
 
 class ProductTypeForm(forms.Form):
     PRODUCT_TYPES = [
@@ -81,4 +81,37 @@ class EditClientForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
+class OrderItemForm(forms.ModelForm):
+    quantity = forms.IntegerField(
+        min_value=1,
+        label='Cantidad',
+        widget=forms.NumberInput(attrs={'class': 'form-control'})
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.initial_quantity = self.instance.quantity
+
+class OrderMusicItemForm(OrderItemForm):
+    class Meta:
+        model = OrderMusicItem
+        fields = ['quantity']
+
+class OrderElectronicItemForm(OrderItemForm):
+    class Meta:
+        model = OrderElectronicItem
+        fields = ['quantity']
+
+class OrderStatusForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['status']
+        widgets = {
+            'status': forms.Select(attrs={'class': 'form-control'})
+        }
+        labels = {
+            'status': 'Estado',
         }

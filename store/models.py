@@ -79,7 +79,7 @@ class Order(models.Model):
         ('pagado', 'Pagado'),
         ('en camino', 'En camino'),
         ('entregado', 'Entregado'),
-        ('cancelado', 'cancelado'),
+        ('cancelado', 'Cancelada'),
     ]
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pendiente')
     music_products = models.ManyToManyField(MusicProduct, through='OrderMusicItem')
