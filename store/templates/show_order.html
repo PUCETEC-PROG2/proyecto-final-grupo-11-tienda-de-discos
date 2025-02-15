@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Detalle de Orden #{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Detalle de Orden #{{ order.id }}</h2>
+            
+            <!-- Información del Cliente -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Información del Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Nombre:</strong> {{ order.client.name }} {{ order.client.last_name }}</p>
+                    <p><strong>Email:</strong> {{ order.client.email }}</p>
+                    <p><strong>Teléfono:</strong> {{ order.client.phone }}</p>
+                    <p><strong>Dirección:</strong> {{ order.client.address }}</p>
+                    <p><strong>Identificación:</strong> {{ order.client.id_number }}</p>
+                </div>
+            </div>
+
+            <!-- Estado de la Orden -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Estado de la Orden</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Fecha:</strong> {{ order.created_at|date:"d/m/Y H:i" }}</p>
+                    <p>
+                        <strong>Estado:</strong>
+                        {% if order.status == 'pendiente' %}
+                            <span class="badge bg-warning">Pendiente</span>
+                        {% elif order.status == 'pagado' %}
+                            <span class="badge bg-success">Pagado</span>
+                        {% elif order.status == 'en camino' %}
+                            <span class="badge bg-info">En Camino</span>
+                        {% elif order.status == 'entregado' %}
+                            <span class="badge bg-primary">Entregado</span>
+                        {% elif order.status == 'cancelado' %}
+                            <span class="badge bg-danger">Cancelado</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Productos Musicales -->
+            {% if music_items %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Productos Musicales</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Artista</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unitario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in music_items %}
+                                <tr>
+                                    <td>{{ item.product.title }}</td>
+                                    <td>{{ item.product.artist }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.unit_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Productos Electrónicos -->
+            {% if electronic_items %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Productos Electrónicos</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Marca</th>
+                                    <th>Modelo</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio Unitario</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in electronic_items %}
+                                <tr>
+                                    <td>{{ item.product.name }}</td>
+                                    <td>{{ item.product.brand }}</td>
+                                    <td>{{ item.product.model }}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>${{ item.unit_price }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Total -->
+            <div class="card">
+                <div class="card-body text-end">
+                    <h4>Total (IVA incluido): ${{ order.total_amount }}</h4>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="mt-4">
+                <a href="{% url 'store:view_orders' %}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Volver a Órdenes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<br>
+{% endblock %}

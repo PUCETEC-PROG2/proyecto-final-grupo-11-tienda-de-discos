@@ -271,6 +271,17 @@ def client_list(request):
 @login_required
 def add_client(request):
     if request.method == "POST":
+        id_number = request.POST.get('id_number')
+        # Verificar si existe un cliente con el mismo id_number
+        existing_client = Client.objects.filter(id_number=id_number).first()
+        
+        if existing_client:
+            messages.warning(
+                request, 
+                f"Ya existe un cliente con el número de identificación {id_number}: {existing_client.name} {existing_client.last_name}"
+            )
+            return render(request, 'add_client.html', {'form': EditClientForm(request.POST)})
+        
         form = EditClientForm(request.POST)
         if form.is_valid():
             form.save()
@@ -280,28 +291,24 @@ def add_client(request):
             messages.error(request, "Por favor corrija los errores en el formulario.")
     else:
         form = EditClientForm()
+    
     return render(request, 'add_client.html', {'form': form})
-
 
 
 @login_required    
 def edit_client(request, pk):
-    client = Client.objects.get(pk=pk)
+    client = get_object_or_404(Client, pk=pk)
     client_form = EditClientForm(request.POST or None, instance=client)
-    storage = messages.get_messages(request)
-    for _ in storage: 
-        pass
     
     if request.method == 'POST' and client_form.is_valid():
         client_form.save()
         messages.success(request, "Cliente actualizado exitosamente.")
         return redirect('store:show_clients') 
     
-    context = {
+    return render(request, 'edit_client.html', {
         'client_form': client_form,
         'client': client
-    }
-    return render(request, 'edit_client.html', context)
+    })
 
 @login_required
 def delete_client(request, pk):
@@ -351,88 +358,25 @@ def view_orders(request):
     return render(request, 'orders.html', context)
 
 @login_required
-def edit_order(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    client_form = EditClientForm(request.POST or None, instance=order.client)
-
-    if request.method == 'POST':
-        if 'update_client' in request.POST:
-            if client_form.is_valid():
-                client_form.save()
-                messages.success(request, "Datos del cliente actualizados exitosamente")
-                return redirect('store:edit_order', order_id=order.id)
-        elif 'cancel_order' in request.POST:
-            try:
-                # Restaurar stock de productos musicales
-                for music_item in order.ordermusicitem_set.all():
-                    product = music_item.product
-                    product.stock += music_item.quantity
-                    product.save()
-                    music_item.delete()
-                
-                # Restaurar stock de productos electrónicos
-                for electronic_item in order.orderelectronicitem_set.all():
-                    product = electronic_item.product
-                    product.stock += electronic_item.quantity
-                    product.save()
-                    electronic_item.delete()
-                
-                # Marcar orden como cancelada
-                order.status = 'Cancelada'
-                order.save()
-                
-                messages.success(request, "Orden cancelada y stock restaurado exitosamente")
-                return redirect('store:view_orders')
-                
-            except Exception as e:
-                messages.error(request, f"Error al cancelar la orden: {str(e)}")
-        else:
-            # Solo permitir cambiar el estado si no está cancelada
-            if order.status != 'Cancelada':
-                status_form = OrderStatusForm(request.POST, instance=order)
-                if status_form.is_valid():
-                    status_form.save()
-                    messages.success(request, "Estado de la orden actualizado exitosamente")
-                    return redirect('store:view_orders')
+def show_order(request, pk):  # Cambia order_id por pk
+    order = get_object_or_404(Order, id=pk)
     
-    # Si la orden está cancelada, mostrar mensaje informativo
-    if order.status == 'Cancelada':
-        messages.info(request, "Esta orden está cancelada. Para modificar los productos, por favor cree una nueva orden.")
+    # Obtener los items de la orden
+    music_items = order.ordermusicitem_set.all()
+    electronic_items = order.orderelectronicitem_set.all()
+    
+    # Calcular total
+    total = sum(item.quantity * item.unit_price for item in music_items) + \
+            sum(item.quantity * item.unit_price for item in electronic_items)
     
     context = {
         'order': order,
-        'status_form': OrderStatusForm(instance=order) if order.status != 'Cancelada' else None,
-        'client_form': client_form,
-        'music_items': order.ordermusicitem_set.all(),
-        'electronic_items': order.orderelectronicitem_set.all(),
+        'music_items': music_items,
+        'electronic_items': electronic_items,
+        'total': total
     }
-    return render(request, 'edit_order.html', context)
+    return render(request, 'show_order.html', context)
 
-
-def remove_order_item(request, order_id, item_id, item_type):
-    order = get_object_or_404(Order, id=order_id)
-    
-    try:
-        if item_type == 'music':
-            item = get_object_or_404(OrderMusicItem, id=item_id, order=order)
-            product = item.product
-        else:
-            item = get_object_or_404(OrderElectronicItem, id=item_id, order=order)
-            product = item.product
-            
-        # Devolver el stock
-        product.stock += item.quantity
-        product.save()
-        
-        # Eliminar el item
-        item.delete()
-        
-        messages.success(request, "Producto eliminado de la orden exitosamente")
-        
-    except Exception as e:
-        messages.error(request, f"Error al eliminar el producto: {str(e)}")
-        
-    return redirect('store:edit_order', order_id=order_id)
 
 ####################### Vistas para gestionar el carrito de compras #######################
 def add_to_cart(request, pk):
@@ -507,71 +451,108 @@ def clear_cart(request):
 
 def checkout(request):
     cart = ShoppingCart(request)
+    # Limpiar mensajes anteriores
     storage = messages.get_messages(request)
-    for _ in storage: 
-        pass
-    
+    for _ in storage:
+        pass  
+
     if not cart.cart:
         messages.error(request, "El carrito está vacío")
         return redirect('store:cart_detail')
-        
-    client_form = EditClientForm(request.POST or None)
     
+    # Procesar verificación de cliente existente
+    if request.method == "POST":
+        client_type = request.POST.get('client_type')
+        
+        if client_type == 'existing':
+            id_number = request.POST.get('id_number')
+            if id_number:
+                existing_client = Client.objects.filter(id_number=id_number).first()
+                if existing_client:
+                    try:
+                        order = create_order_for_client(existing_client, cart)
+                        cart.clear()
+                        messages.success(request, "¡Orden creada exitosamente!")
+                        return redirect('store:show_order', pk=order.id) 
+                    except Exception as e:
+                        messages.error(request, f"Error al procesar la orden: {str(e)}")
+                else:
+                    messages.warning(request, "Cliente no encontrado. Por favor regístrese como cliente nuevo.")
+                    return render(request, 'checkout.html', {
+                        'cart': cart,
+                        'show_full_form': True,
+                        'client_form': EditClientForm(initial={'id_number': id_number})
+                    })
+        elif client_type == 'new':
+            # Mostrar el formulario completo para nuevo cliente
+            return render(request, 'checkout.html', {
+                'cart': cart,
+                'show_full_form': True,
+                'client_form': EditClientForm()
+            })
+    
+    # Primera carga de la página
     context = {
         'cart': cart,
-        'client_form': client_form,
+        'show_full_form': False,
+        'client_form': EditClientForm()
     }
     return render(request, 'checkout.html', context)
 
 def create_order(request):
     if request.method != 'POST':
         return redirect('store:checkout')
-        
+    
     cart = ShoppingCart(request)
     client_form = EditClientForm(request.POST)
     
     if client_form.is_valid():
         try:
             client = client_form.save()
-            
-            order = Order.objects.create(
-                client=client,
-                status='pendiente'
-            )
-            
-            for item_id, item in cart.cart.items():
-                try:
-                    product = MusicProduct.objects.get(id=item['product_id'])
-                    OrderMusicItem.objects.create(
-                        order=order,
-                        product=product,
-                        quantity=item['quantity'],
-                        unit_price=item['price']
-                    )
-                except MusicProduct.DoesNotExist:
-                    try:
-                        product = ElectronicProduct.objects.get(id=item['product_id'])
-                        OrderElectronicItem.objects.create(
-                            order=order,
-                            product=product,
-                            quantity=item['quantity'],
-                            unit_price=item['price']
-                        )
-                    except ElectronicProduct.DoesNotExist:
-                        continue
-                
-                # Actualizar stock
-                product.stock -= item['quantity']
-                product.save()
-            
-            # Limpiar carrito
+            order = create_order_for_client(client, cart)
             cart.clear()
             messages.success(request, "¡Orden creada exitosamente!")
-            return redirect('store:order_detail', order_id=order.id)
-            
+            return redirect('store:show_order', pk=order.id)  
         except Exception as e:
             messages.error(request, f"Error al procesar la orden: {str(e)}")
-            return redirect('store:checkout')
+    else:
+        messages.error(request, "Por favor corrija los errores en el formulario")
     
-    messages.error(request, "Por favor corrija los errores en el formulario")
-    return redirect('store:checkout')
+    return render(request, 'checkout.html', {
+        'cart': cart,
+        'client_form': client_form,
+        'show_full_form': True
+    })
+
+def create_order_for_client(client, cart):
+    order = Order.objects.create(
+        client=client,
+        status='pendiente'
+    )
+    
+    for item_id, item in cart.cart.items():
+        try:
+            product = MusicProduct.objects.get(id=item['product_id'])
+            OrderMusicItem.objects.create(
+                order=order,
+                product=product,
+                quantity=item['quantity'],
+                unit_price=item['price']
+            )
+        except MusicProduct.DoesNotExist:
+            try:
+                product = ElectronicProduct.objects.get(id=item['product_id'])
+                OrderElectronicItem.objects.create(
+                    order=order,
+                    product=product,
+                    quantity=item['quantity'],
+                    unit_price=item['price']
+                )
+            except ElectronicProduct.DoesNotExist:
+                continue
+        
+        # Actualizar stock
+        product.stock -= item['quantity']
+        product.save()
+    
+    return order
