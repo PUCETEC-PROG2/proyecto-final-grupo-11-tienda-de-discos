@@ -4,6 +4,7 @@ from itertools import chain
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from .models import MusicProduct, ElectronicProduct, Client, Order, OrderMusicItem, OrderElectronicItem
 from .shopping_cart import ShoppingCart
 from .pagination import PaginationMixin
@@ -28,18 +29,45 @@ def all_products(request):
     pagination = PaginationMixin()
     music_products = MusicProduct.objects.all()
     electronic_products = ElectronicProduct.objects.all()
-    combined_products = list(chain(music_products, electronic_products))
+    
+    # Búsqueda
+    search_query = request.GET.get("q")
+    if search_query:
+        music_products = music_products.filter(
+            Q(title__icontains=search_query) |
+            Q(artist__icontains=search_query)
+        )
+        electronic_products = electronic_products.filter(
+            Q(name__icontains=search_query) |
+            Q(brand__icontains=search_query)
+        )
+    
+    # Ordenamiento
+    sort = request.GET.get('sort')
+    if sort == 'price_asc':
+        music_products = music_products.order_by('price')
+        electronic_products = electronic_products.order_by('price')
+    elif sort == 'price_desc':
+        music_products = music_products.order_by('-price')
+        electronic_products = electronic_products.order_by('-price')
+    else:
+        music_products = music_products.order_by('title')
+        electronic_products = electronic_products.order_by('name')
 
+    # Asignar tipo de producto
     for product in music_products:
         product.product_type = 'music'
     for product in electronic_products:
         product.product_type = 'electronic'
 
+    combined_products = list(chain(music_products, electronic_products))
     products_page, paginator = pagination.paginate_queryset(combined_products, request)
     
     context = {
         'products': products_page,
         'paginator': paginator,
+        'search_query': search_query,
+        'current_sort': sort,
     }
     return render(request, 'products.html', context)
 
@@ -47,6 +75,16 @@ def all_products(request):
 def music_product(request):
     pagination = PaginationMixin()
     music_products = MusicProduct.objects.order_by('title')
+    
+    search_query = request.GET.get("q")
+    
+    if search_query:
+        music_products = music_products.filter(
+            Q(title__icontains=search_query) |
+            Q(artist__icontains=search_query) |
+            Q(genre__icontains=search_query)
+        )
+    
     for product in music_products:
         product.product_type = 'music'
     
@@ -54,13 +92,40 @@ def music_product(request):
     
     context = {
         'products': products_page,
-        'paginator': paginator
+        'paginator': paginator,
+        'search_query': search_query,
     }
     return render(request, 'music.html', context)
 
 def electronic_product(request):
     pagination = PaginationMixin()
-    electronic_products = ElectronicProduct.objects.order_by('name')
+    electronic_products = ElectronicProduct.objects.all()
+    
+    # Búsqueda
+    search_query = request.GET.get("q")
+    if search_query:
+        electronic_products = electronic_products.filter(
+            Q(name__icontains=search_query) |
+            Q(brand__icontains=search_query) |
+            Q(model__icontains=search_query)
+        )
+    
+    # Filtros
+    brand = request.GET.get('brand')
+    sort = request.GET.get('sort')
+    
+    if brand:
+        electronic_products = electronic_products.filter(brand=brand)
+
+    
+    # Ordenamiento
+    if sort == 'price_asc':
+        electronic_products = electronic_products.order_by('price')
+    elif sort == 'price_desc':
+        electronic_products = electronic_products.order_by('-price')
+    else:
+        electronic_products = electronic_products.order_by('name')
+    
     for product in electronic_products:
         product.product_type = 'electronic'
     
@@ -68,7 +133,11 @@ def electronic_product(request):
     
     context = {
         'products': products_page,
-        'paginator': paginator
+        'paginator': paginator,
+        'search_query': search_query,
+        'current_brand': brand,
+        'current_sort': sort,
+        'brands': ElectronicProduct._meta.get_field('brand').choices,
     }
     return render(request, 'electronic.html', context)
 
@@ -155,12 +224,35 @@ def edit_product(request, pk, product_type):
 
 def client_list(request):
     pagination = PaginationMixin()
-    clients = Client.objects.order_by('name')
+    clients = Client.objects.all()
+    
+    # Búsqueda usando search_bar
+    search_query = request.GET.get("q")
+    if search_query:
+        clients = clients.filter(
+            Q(name__icontains=search_query) |
+            Q(last_name__icontains=search_query) |
+            Q(email__icontains=search_query)
+        )
+    
+    # Solo ordenamiento
+    sort = request.GET.get('sort')
+    if sort == 'name':
+        clients = clients.order_by('name')
+    elif sort == '-name':
+        clients = clients.order_by('-name')
+    elif sort == 'email':
+        clients = clients.order_by('email')
+    else:
+        clients = clients.order_by('name')
+    
     clients_page, paginator = pagination.paginate_queryset(clients, request)
     
     context = {
         'clients': clients_page,
         'paginator': paginator,
+        'search_query': search_query,
+        'current_sort': sort
     }
     return render(request, 'show_clients.html', context)
 
@@ -209,9 +301,40 @@ class CustomLoginView(LoginView):
     template_name = "login_form.html"
 
 def view_orders(request):
+    pagination = PaginationMixin()
     orders = Order.objects.all()
+    
+    # Búsqueda usando search_bar
+    search_query = request.GET.get("q")
+    if search_query:
+        orders = orders.filter(
+            Q(client__name__icontains=search_query) |
+            Q(client__last_name__icontains=search_query) |
+            Q(status__icontains=search_query)
+        )
+    
+    # Filtros adicionales
+    status = request.GET.get('status')
+    if status:
+        orders = orders.filter(status=status)
+    
+    sort = request.GET.get('sort')
+    if sort == 'date_asc':
+        orders = orders.order_by('created_at')
+    elif sort == 'date_desc':
+        orders = orders.order_by('-created_at')
+    else:
+        orders = orders.order_by('-created_at')
+    
+    orders_page, paginator = pagination.paginate_queryset(orders, request)
+    
     context = {
-        'orders': orders,
+        'orders': orders_page,
+        'paginator': paginator,
+        'search_query': search_query,
+        'current_status': status,
+        'current_sort': sort,
+        'status_choices': Order._meta.get_field('status').choices
     }
     return render(request, 'orders.html', context)
 
