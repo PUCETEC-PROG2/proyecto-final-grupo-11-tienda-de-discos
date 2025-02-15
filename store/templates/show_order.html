@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 {% block title %}Detalle de Orden #{{ order.id }}{% endblock %}
 
 {% block content %}
@@ -68,7 +69,7 @@
                                     <td>{{ item.product.title }}</td>
                                     <td>{{ item.product.artist }}</td>
                                     <td>{{ item.quantity }}</td>
-                                    <td>${{ item.unit_price }}</td>
+                                    <td>${{ item.unit_price|floatformat:2|intcomma }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -103,7 +104,7 @@
                                     <td>{{ item.product.brand }}</td>
                                     <td>{{ item.product.model }}</td>
                                     <td>{{ item.quantity }}</td>
-                                    <td>${{ item.unit_price }}</td>
+                                    <td>${{ item.unit_price|floatformat:2|intcomma }}</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
@@ -116,7 +117,7 @@
             <!-- Total -->
             <div class="card">
                 <div class="card-body text-end">
-                    <h4>Total (IVA incluido): ${{ order.total_amount }}</h4>
+                    <h4>Total (IVA incluido): ${{ order.total_amount|floatformat:2|intcomma }}</h4>
                 </div>
             </div>
 
