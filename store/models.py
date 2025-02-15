@@ -66,7 +66,8 @@ class Client(models.Model):
     email = models.EmailField()
     phone = models.CharField(max_length=10)
     address = models.TextField(max_length=200)
-
+    id_number = models.CharField(max_length=10, unique=True, default='0000000000')
+    
     def __str__(self):
         return f"{self.name} {self.last_name}"    
 
