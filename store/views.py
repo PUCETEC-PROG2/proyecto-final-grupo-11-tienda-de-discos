@@ -73,15 +73,41 @@ def add_product(request):
     music_form = MusicProductForm(request.POST or None, request.FILES or None)
     electronic_form = ElectronicProductForm(request.POST or None, request.FILES or None)
     
-    if request.method == 'POST' and 'product_type' in request.POST:
-        if request.POST['product_type'] == 'music' and music_form.is_valid():
-            music_form.save()
-            messages.success(request, "Producto añadido exitosamente.")
-            return redirect('music_products_list')
-        elif request.POST['product_type'] == 'electronic' and electronic_form.is_valid():
-            electronic_form.save()
-            messages.success(request, "Producto añadido exitosamente.")
-            return redirect('electronic_products_list')
+    if request.method == 'POST':
+        if 'product_type' not in request.POST:
+            messages.error(request, "Por favor seleccione un tipo de producto.")
+        else:
+            product_type = request.POST['product_type']
+            
+            if product_type == 'music':
+                if music_form.is_valid():
+                    try:
+                        product = music_form.save()
+                        messages.success(request, f"Producto musical '{product.name}' añadido exitosamente.")
+                        return redirect('store:all_music')
+                    except Exception as e:
+                        messages.error(request, f"Error al guardar el producto: {str(e)}")
+                else:
+                    messages.error(request, "Por favor corrija los errores en el formulario de música.")
+                    for field, errors in music_form.errors.items():
+                        for error in errors:
+                            messages.error(request, f"{field}: {error}")
+                            
+            elif product_type == 'electronic':
+                if electronic_form.is_valid():
+                    try:
+                        product = electronic_form.save()
+                        messages.success(request, f"Producto electrónico '{product.name}' añadido exitosamente.")
+                        return redirect('store:all_electronic')
+                    except Exception as e:
+                        messages.error(request, f"Error al guardar el producto: {str(e)}")
+                else:
+                    messages.error(request, "Por favor corrija los errores en el formulario de electrónicos.")
+                    for field, errors in electronic_form.errors.items():
+                        for error in errors:
+                            messages.error(request, f"{field}: {error}")
+            else:
+                messages.error(request, "Tipo de producto no válido.")
     
     context = {
         'type_form': type_form,

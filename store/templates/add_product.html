@@ -1,126 +1,149 @@
-<!-- add_product.html -->
 {% extends "base.html" %}
-{% block title %}Añadir Producto{% endblock title %}
+{% block title %}Añadir Producto{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
-    <h1>Añadir Productos</h1>
-    
-    <form method="post" enctype="multipart/form-data" id="product-form">
-        {% csrf_token %}
-        
-        <div class="form-group mb-4">
-            <h4>Seleccione el tipo de producto</h4>
-            {{ type_form.product_type }}
+    <h1>Añadir Nuevo Producto</h1>
+
+    {% if messages %}
+    <div class="messages mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="add-product-form">
+        {% csrf_token %}
         
         <div class="card mb-4">
             <div class="card-header">
-                <h5>Información Básica:</h5>
+                <h5>Tipo de Producto</h5>
             </div>
             <div class="card-body">
-                <div class="form-group">
-                    <label for="{{ music_form.name.id_for_label }}">Nombre</label>
-                    {{ music_form.name }}
+                {{ type_form.product_type }}
+            </div>
+        </div>
+
+        <!-- Formulario Música -->
+        <div id="music-form" style="display: none;">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Producto Musical</h5>
                 </div>
-                <div class="form-group mt-3">
-                    <label for="{{ music_form.price.id_for_label }}">Precio</label>
-                    {{ music_form.price }}
-                </div>
-                <div class="form-group mt-3">
-                    <label for="{{ music_form.description.id_for_label }}">Descripción</label>
-                    {{ music_form.description }}
-                </div>
-                <div class="form-group mt-3">
-                    <label for="{{ music_form.picture.id_for_label }}">Imagen</label>
-                    {{ music_form.picture }}
+                <div class="card-body">
+                    {% for field in music_form %}
+                    <div class="mb-3">
+                        <label for="music_{{ field.name }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger">
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                        {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
-        
-        <div id="music-fields" class="card mb-4" style="display: none;">
-            <div class="card-header">
-                <h5>Música</h5>
-            </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label for="{{ music_form.artist.id_for_label }}">Artista</label>
-                    {{ music_form.artist }}
+
+        <!-- Formulario Electrónicos -->
+        <div id="electronic-form" style="display: none;">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Producto Electrónico</h5>
                 </div>
-                <div class="form-group mt-3">
-                    <label for="{{ music_form.title.id_for_label }}">Título</label>
-                    {{ music_form.title }}
-                </div>
-                <div class="form-group mt-3">
-                    <label for="{{ music_form.release_date.id_for_label }}">Fecha de Lanzamiento</label>
-                    {{ music_form.release_date }}
-                </div>
-                <div class="form-group mt-3">
-                    <label for="{{ music_form.genre.id_for_label }}">Génro</label>
-                    {{ music_form.genre }}
-                </div>
-                <div class="form-group mt-3">
-                    <label for="{{ music_form.format.id_for_label }}">Formato</label>
-                    {{ music_form.format }}
+                <div class="card-body">
+                    {% for field in electronic_form %}
+                    <div class="mb-3">
+                        <label for="electronic_{{ field.name }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger">
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                        {% if field.help_text %}
+                        <div class="form-text">{{ field.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
-        
-        <div id="electronic-fields" class="card mb-4" style="display: none;">
-            <div class="card-header">
-                <h5>Electrónicos</h5>
-            </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label for="{{ electronic_form.brand.id_for_label }}">Marca</label>
-                    {{ electronic_form.brand }}
-                </div>
-                <div class="form-group mt-3">
-                    <label for="{{ electronic_form.model.id_for_label }}">Modelo</label>
-                    {{ electronic_form.model }}
-                </div>
-                <div class="form-group mt-3">
-                    <label for="{{ electronic_form.category.id_for_label }}">Categoría</label>
-                    {{ electronic_form.category }}
-                </div>
-            </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar Producto
+            </button>
+            <a href="{% url 'store:all_products' %}" class="btn btn-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
         </div>
-        
-        <button type="submit" class="btn btn-primary mb-4">Guardar</button>
-        <a href="{% url 'store:index' %}" class="btn btn-secondary mb-4">Cancelar</a>
     </form>
 </div>
+{% endblock %}
 
-{% block extra_js %}
+{% block javascript %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const productTypeInputs = document.querySelectorAll('input[name="product_type"]');
-        const musicFields = document.getElementById('music-fields');
-        const electronicFields = document.getElementById('electronic-fields');
-        
-        // Initial check
-        updateFormVisibility();
-        
-        // Add event listeners to all radio buttons
-        productTypeInputs.forEach(input => {
-            input.addEventListener('change', updateFormVisibility);
+document.addEventListener('DOMContentLoaded', function() {
+    const musicForm = document.getElementById('music-form');
+    const electronicForm = document.getElementById('electronic-form');
+    const radioInputs = document.querySelectorAll('input[name="product_type"]');
+
+    function toggleForms(selectedType) {
+        if (selectedType === 'music') {
+            musicForm.style.display = 'block';
+            electronicForm.style.display = 'none';
+            // Deshabilitar campos de electrónicos
+            electronicForm.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = true;
+            });
+            // Habilitar campos de música
+            musicForm.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = false;
+            });
+        } else if (selectedType === 'electronic') {
+            musicForm.style.display = 'none';
+            electronicForm.style.display = 'block';
+            // Deshabilitar campos de música
+            musicForm.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = true;
+            });
+            // Habilitar campos de electrónicos
+            electronicForm.querySelectorAll('input, select, textarea').forEach(input => {
+                input.disabled = false;
+            });
+        }
+    }
+
+    // Escuchar cambios en los radio buttons
+    radioInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            toggleForms(this.value);
         });
-        
-        function updateFormVisibility() {
-            const selectedType = document.querySelector('input[name="product_type"]:checked')?.value;
-            
-            if (selectedType === 'music') {
-                musicFields.style.display = 'block';
-                electronicFields.style.display = 'none';
-            } else if (selectedType === 'electronic') {
-                musicFields.style.display = 'none';
-                electronicFields.style.display = 'block';
-            } else {
-                // If nothing selected yet
-                musicFields.style.display = 'none';
-                electronicFields.style.display = 'none';
-            }
+    });
+
+    // Verificar si hay un tipo seleccionado al cargar
+    const selectedType = document.querySelector('input[name="product_type"]:checked');
+    if (selectedType) {
+        toggleForms(selectedType.value);
+    }
+
+    // Validación del formulario
+    document.getElementById('add-product-form').addEventListener('submit', function(e) {
+        const selectedType = document.querySelector('input[name="product_type"]:checked');
+        if (!selectedType) {
+            e.preventDefault();
+            alert('Por favor seleccione un tipo de producto');
         }
     });
+});
 </script>
-{% endblock %}
 {% endblock %}
