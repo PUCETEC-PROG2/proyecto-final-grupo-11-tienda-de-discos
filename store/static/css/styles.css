@@ -40,3 +40,15 @@
     margin-right: 1rem;  
 }
 
+body {
+    /* Dotted notebook background */
+    background-color: #f5f5f5; /* Light gray background (notebook paper color) */
+    background-image:
+      radial-gradient(circle, #ccc 2px, transparent 1px); /* The dots */
+    background-size:
+      40px 40px;     /* Dot spacing (horizontal and vertical) */
+    background-position:
+      0 0;      /* Dot position (you can offset this) */
+    min-height: 100vh; /* Ensure the background covers the entire viewport height */
+    margin: 0; /* Remove default body margin */
+}
