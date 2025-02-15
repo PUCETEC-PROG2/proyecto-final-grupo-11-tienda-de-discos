@@ -20,4 +20,7 @@ urlpatterns = [
     path('edit-music/<int:pk>/', views.edit_product, {'product_type': 'music'}, name='edit_music'),
     path('edit-electronic/<int:pk>/', views.edit_product, {'product_type': 'electronic'}, name='edit_electronic'),
     path('add_product/', views.add_product, name='add_product'),
+    path('edit-order/<int:order_id>/', views.edit_order, name='edit_order'),
+    path('remove-order-item/<int:order_id>/<int:item_id>/<str:item_type>/',views.remove_order_item, name='remove_order_item'),
 ]
+

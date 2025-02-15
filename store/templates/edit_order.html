@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Orden #{{ order.id }}</h1>
+    
+    {% if messages %}
+    <div class="messages mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Detalles del Cliente</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Nombre:</strong> {{ order.client.name }} {{ order.client.last_name }}</p>
+            <p><strong>Email:</strong> {{ order.client.email }}</p>
+            <p><strong>Teléfono:</strong> {{ order.client.phone }}</p>
+            <p><strong>Dirección:</strong> {{ order.client.address }}</p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Datos del Cliente</h5>
+        </div>
+        <div class="card-body">
+            <form method="post">
+                {% csrf_token %}
+                {% for field in client_form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                    <div class="text-danger">
+                        {{ field.errors }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                <button type="submit" name="update_client" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Actualizar Datos del Cliente
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Estado de la Orden</h5>
+        </div>
+        <div class="card-body">
+            {% if status_form %}
+            <form method="post">
+                {% csrf_token %}
+                {{ status_form }}
+                <button type="submit" class="btn btn-primary mt-3">Actualizar Estado</button>
+            </form>
+            {% else %}
+            <p class="text-danger">Orden cancelada</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5>Productos en la Orden</h5>
+            <span class="badge bg-{{ order.status|lower }}-subtle text-{{ order.status|lower }}">
+                {{ order.get_status_display }}
+            </span>
+        </div>
+        <div class="card-body">
+            {% if order.ordermusicitem_set.exists or order.orderelectronicitem_set.exists %}
+                {% if order.ordermusicitem_set.exists %}
+                <h6>Productos Musicales</h6>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Artista</th>
+                            <th>Género</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.ordermusicitem_set.all %}
+                        <tr>
+                            <td>
+                                {% if item.product.picture %}
+                                <img src="{{ item.product.picture.url }}" alt="{{ item.product.name }}" class="img-thumbnail me-2" style="max-width: 50px;">
+                                {% endif %}
+                                {{ item.product.name }}
+                            </td>
+                            <td>{{ item.product.artist }}</td>
+                            <td>{{ item.product.get_genre_display }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>${{ item.unit_price }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+
+                {% if order.orderelectronicitem_set.exists %}
+                <h6 class="mt-4">Productos Electrónicos</h6>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in order.orderelectronicitem_set.all %}
+                        <tr>
+                            <td>
+                                {% if item.product.picture %}
+                                <img src="{{ item.product.picture.url }}" alt="{{ item.product.name }}" class="img-thumbnail me-2" style="max-width: 50px;">
+                                {% endif %}
+                                {{ item.product.name }}
+                            </td>
+                            <td>{{ item.product.brand }}</td>
+                            <td>{{ item.product.model }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>${{ item.unit_price }}</td>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+
+            {% else %}
+                <div class="alert alert-info">
+                    No hay productos en esta orden.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between">
+        {% if order.status != 'cancelada' %}
+        <form method="post" onsubmit="return confirm('¿Está seguro de cancelar esta orden? Se restaurará el stock de los productos.');">
+            {% csrf_token %}
+            <button type="submit" name="cancel_order" class="btn btn-danger">
+                <i class="fas fa-times"></i> Cancelar Orden
+            </button>
+        </form>
+        {% endif %}
+        
+        <a href="{% url 'store:view_orders' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver a Órdenes
+        </a>
+    </div>
+</div>
+<br>
+{% endblock %}

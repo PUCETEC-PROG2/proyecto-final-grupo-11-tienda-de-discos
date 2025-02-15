@@ -29,14 +29,9 @@
                     <p>Valor: ${{order.total_amount|floatformat:2|intcomma }}</p>
                     {% if user.is_authenticated %}
                         <a
-                            href="/edit_order/{{order.pk}}"
+                            href="/edit-order/{{order.pk}}"
                             class="btn btn-primary"
                             ><i class="fa-solid fa-pen-to-square"></i
-                        ></a>
-                        <a
-                            href="/delete_order/{{order.pk}}"
-                            class="btn btn-danger"
-                            ><i class="fa-solid fa-trash"></i
                         ></a>
                         {% endif %}
                 </div>
