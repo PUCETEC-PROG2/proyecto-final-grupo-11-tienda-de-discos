@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load humanize %}
 {% block title %}Carrito de Compras{% endblock title %}
 
 {% block content %}
@@ -33,9 +34,9 @@
                 {% endfor %}
             <br>
             <div class="col-md-6">
-                <p>Subtotal: ${{ cart.get_subtotal }}</p>
-                <p>IVA: ${{ cart.get_tax_amount }}</p>
-                <p>Total: {{ cart.get_total_with_tax }}</p>
+                <p>Subtotal: ${{ cart.get_subtotal|floatformat:2|intcomma  }}</p>
+                <p>IVA: ${{ cart.get_tax_amount|floatformat:2|intcomma  }}</p>
+                <p>Total: {{ cart.get_total_with_tax|floatformat:2|intcomma  }}</p>
             </div>
             </div>
             <br>
