@@ -149,14 +149,14 @@
     </div>
 
     <div class="d-flex justify-content-between">
-        {% if order.status != 'cancelada' %}
+        {% comment %} {% if order.status != 'cancelada' %}
         <form method="post" onsubmit="return confirm('¿Está seguro de cancelar esta orden? Se restaurará el stock de los productos.');">
             {% csrf_token %}
             <button type="submit" name="cancel_order" class="btn btn-danger">
                 <i class="fas fa-times"></i> Cancelar Orden
             </button>
         </form>
-        {% endif %}
+        {% endif %} {% endcomment %}
         
         <a href="{% url 'store:view_orders' %}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Volver a Órdenes
