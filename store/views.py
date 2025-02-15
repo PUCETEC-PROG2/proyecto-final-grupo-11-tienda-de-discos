@@ -2,6 +2,8 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.views.generic import ListView, DetailView
 from itertools import chain
 from django.contrib import messages
+from django.contrib.auth.views import LoginView
+from django.contrib.auth.decorators import login_required
 from .models import MusicProduct, ElectronicProduct, Client, Order, OrderMusicItem, OrderElectronicItem
 from .shopping_cart import ShoppingCart
 from .pagination import PaginationMixin
@@ -18,6 +20,9 @@ def index(request):
     return render(request, 'index.html', context)
 
 ###################### Vistas para gestionar productos ######################
+
+class CustomLoginView(LoginView):
+    template_name = "login_form.html"
 
 def all_products(request):
     pagination = PaginationMixin()
@@ -67,7 +72,7 @@ def electronic_product(request):
     }
     return render(request, 'electronic.html', context)
 
-
+@login_required
 def add_product(request):
     type_form = ProductTypeForm(request.POST or None)
     music_form = MusicProductForm(request.POST or None, request.FILES or None)
@@ -116,6 +121,7 @@ def add_product(request):
     }
     return render(request, 'add_product.html', context)
 
+@login_required
 def edit_product(request, pk, product_type):
     product = None
     form = None
@@ -158,7 +164,7 @@ def client_list(request):
     }
     return render(request, 'show_clients.html', context)
 
-    
+@login_required    
 def edit_client(request, pk):
     client = Client.objects.get(pk=pk)
     client_form = EditClientForm(request.POST or None, instance=client)
@@ -184,6 +190,7 @@ def view_orders(request):
     }
     return render(request, 'orders.html', context)
 
+@login_required
 def edit_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     client_form = EditClientForm(request.POST or None, instance=order.client)

@@ -22,5 +22,6 @@ urlpatterns = [
     path('add_product/', views.add_product, name='add_product'),
     path('edit-order/<int:order_id>/', views.edit_order, name='edit_order'),
     path('remove-order-item/<int:order_id>/<int:item_id>/<str:item_type>/',views.remove_order_item, name='remove_order_item'),
+    path('login/', views.CustomLoginView.as_view(), name='login')
 ]
 

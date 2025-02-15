@@ -2,6 +2,9 @@
 {% block title %}Productos{% endblock title %}
 {% block content %}
 <div class="container-fluid">
+    {% if user.is_authenticated %}
+    <a href="{% url 'store:add_product' %}" class="btn btn-primary">Añadir Productos</a>
+    {% endif %}
     <!-- Sección de Productos Musicales -->
     <h2 class="mb-4">Productos Musicales</h2>
     <div class="row">
