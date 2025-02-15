@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block title %}Lista de Clientes{% endblock title %}
 {% block content %}
+{% include "search_bar.html" %}
 <div class="container">
     {% if user.is_authenticated %}
     <a href="{% url 'store:add_client' %}" class="btn btn-primary mt-4 mb-4">Añadir Clientes</a>

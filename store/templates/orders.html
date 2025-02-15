@@ -2,6 +2,7 @@
 {% load humanize %}
 {% block title %}Órdenes{% endblock title %}
 {% block content %}
+{% include "search_bar.html" %}
 <div class="container">
     <div class="accordion" id="accordionOrders">
         {% for order in orders %}
