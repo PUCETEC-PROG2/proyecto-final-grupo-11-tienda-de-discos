@@ -63,17 +63,29 @@ class ElectronicProductForm(forms.ModelForm):
             'stock': forms.NumberInput(attrs={'class': 'form-control'}),
             'picture': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
+
+class ExistingClientForm(forms.Form):
+    class Meta:
+        model = Client
+        fields = ['id_number']
+        labels = {
+            'id_number': 'Número de Identificación'
+        }
+        widgets = {
+            'id_number': forms.TextInput(attrs={'class': 'form-control'})
+        }
         
 class EditClientForm(forms.ModelForm):
     class Meta:
         model = Client
-        fields = ['name', 'last_name', 'email', 'phone', 'address']
+        fields = ['name', 'last_name', 'email', 'phone', 'address', 'id_number']
         labels = {
             'name': 'Nombre',
             'last_name': 'Apellido',
             'email': 'Correo Electrónico',
             'phone': 'Teléfono',
-            'address': 'Dirección'
+            'address': 'Dirección',
+            'id_number': 'Número de Identificación'
         }
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
@@ -81,6 +93,7 @@ class EditClientForm(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'phone': forms.TextInput(attrs={'class': 'form-control'}),
             'address': forms.TextInput(attrs={'class': 'form-control'}),
+            'id_number': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
 class OrderItemForm(forms.ModelForm):

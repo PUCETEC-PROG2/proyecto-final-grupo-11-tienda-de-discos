@@ -1,41 +1,153 @@
 {% extends "base.html" %}
-{% block title %}Checkout{% endblock title %}
+{% block title %}Checkout{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h1>Checkout</h1>
-    <form method="post" action="{% url 'store:create_order' %}">
-        {% csrf_token %}
-        <div class="card">
-            <div class="card-header">
-                <h5>Datos del Cliente</h5>
+    <h1>Finalizar Compra</h1>
+
+    {% if messages %}
+    <div class="messages mb-4">
+        {% for message in messages %}
+        <div class="alert alert-{% if message.tags %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Resumen del Carrito -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Resumen del Carrito</h5>
+        </div>
+        <div class="card-body">
+            {% for item_id, item in cart.cart.items %}
+            <div class="row mb-2">
+                <div class="col">{{ item.name }}</div>
+                <div class="col text-end">{{ item.quantity }} x ${{ item.price }} = ${{ item.total_price }}</div>
             </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label for="{{ client_form.name.id_for_label }}">Nombre</label>
-                    {{ client_form.name }}
-                </div>
-                <div class="form-group mt-3">
-                    <label for="{{ client_form.last_name.id_for_label }}">Apellido</label>
-                    {{ client_form.last_name }}
-                </div>
-                <div class="form-group mt-3">
-                    <label for="{{ client_form.email.id_for_label }}">Email</label>
-                    {{ client_form.email }}
-                </div>
-                <div class="form-group mt-3">
-                    <label for="{{ client_form.phone.id_for_label }}">Teléfono</label>
-                    {{ client_form.phone }}
-                </div>
-                <div class="form-group mt-3">
-                    <label for="{{ client_form.address.id_for_label }}">Dirección</label>
-                    {{ client_form.address }}
-                </div>
+            {% endfor %}
+            <hr>
+            <div class="row">
+                <div class="col"><strong>Subtotal:</strong></div>
+                <div class="col text-end"><strong>${{ cart.get_subtotal }}</strong></div>
             </div>
-            <div class="card-footer">
-                <button type="submit" class="btn btn-primary">Confirmar Compra</button>
+            <div class="row">
+                <div class="col"><strong>IVA (15%):</strong></div>
+                <div class="col text-end"><strong>${{ cart.get_tax_amount }}</strong></div>
+            </div>
+            <div class="row">
+                <div class="col"><strong>Total:</strong></div>
+                <div class="col text-end"><strong>${{ cart.get_total_with_tax }}</strong></div>
             </div>
         </div>
-    </form>
+    </div>
+
+    {% if not show_full_form %}
+        <!-- Selector de tipo de cliente -->
+        <form method="post" id="client-type-form">
+            {% csrf_token %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Tipo de Cliente</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="client_type" id="existing_client" value="existing">
+                            <label class="form-check-label" for="existing_client">Cliente Existente</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="client_type" id="new_client" value="new">
+                            <label class="form-check-label" for="new_client">Cliente Nuevo</label>
+                        </div>
+                    </div>
+
+                    <div id="existing-client-form" style="display: none;">
+                        <div class="mb-3">
+                            <label for="id_number" class="form-label">Número de Identificación</label>
+                            <input type="text" class="form-control" id="id_number" name="id_number">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Verificar Cliente</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    {% else %}
+        <!-- Formulario para cliente nuevo -->
+        <form method="post" action="{% url 'store:create_order' %}">
+            {% csrf_token %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Datos del Cliente</h5>
+                </div>
+                <div class="card-body">
+                    {% for field in client_form %}
+                    <div class="mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}
+                        <div class="text-danger">
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary">Crear Orden</button>
+                </div>
+            </div>
+        </form>
+    {% endif %}
+
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{% url 'store:cart_detail' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Volver al Carrito
+        </a>
+    </div>
 </div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const existingClientForm = document.getElementById('existing-client-form');
+    const newClientForm = document.getElementById('new-client-form');
+    const radioInputs = document.querySelectorAll('input[name="client_type"]');
+
+    radioInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.value === 'existing') {
+                existingClientForm.style.display = 'block';
+                // Agregar el cliente_type al formulario
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'client_type';
+                hiddenInput.value = 'existing';
+                existingClientForm.appendChild(hiddenInput);
+            } else if (this.value === 'new') {
+                // Crear un formulario y enviarlo
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = '{% url "store:checkout" %}';
+                
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = '{{ csrf_token }}';
+                form.appendChild(csrfInput);
+                
+                const clientTypeInput = document.createElement('input');
+                clientTypeInput.type = 'hidden';
+                clientTypeInput.name = 'client_type';
+                clientTypeInput.value = 'new';
+                form.appendChild(clientTypeInput);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    });
+});
+</script>
 {% endblock %}
